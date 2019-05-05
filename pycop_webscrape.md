@@ -41,10 +41,10 @@ be read by people.
 # Getting content
 
  - Browser tools for inspecting content
- - "Hidden" data, e.g. coordinates on a map
- - Links in an image
-
-https://www.epa.gov/ground-water-and-drinking-water/national-primary-drinking-water-regulations
+ - "Hidden" data, e.g. coordinates [on a map](https://www.skinnyski.com/trails/ski/listings.asp?region=ne-mn)
+ - Or links [in an image](https://www.epa.gov/wqs-tech/state-specific-water-quality-standards-effective-under-clean-water-act-cwa)
+ - Multi-level retrieval (contents listing, then data)
+ - Tables [linked from a list](https://www.epa.gov/ground-water-and-drinking-water/national-primary-drinking-water-regulations)
 
 
 
@@ -132,6 +132,10 @@ def main():
 }
 ```
 
+
+
+## Don't use the second level either...
+
 ```python
 {
     'last_run': "Sat 05/04/2019", 
@@ -148,6 +152,12 @@ def main():
     }
 }
 ```
+
+(Unless you want to)
+
+
+
+## First time set up of persistent dict
 
 ```python
 import json, os, time
