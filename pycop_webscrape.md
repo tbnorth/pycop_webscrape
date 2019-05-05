@@ -1,8 +1,7 @@
-# pycop_webscrape
-
-## pycop_webscrape
+# Web-scraping in Python
 
 https://tbnorth.github.io/pycop_webscrape/
+
 
 # Overview
 
@@ -13,37 +12,84 @@ https://tbnorth.github.io/pycop_webscrape/
    - Getting data
    - Parsing data
 
+
 # What is web-scraping
 
 Automated collection of data from web pages designed to
 be read by people.
 
+
 # Why you shouldn't need to do it
 
  - Data rich sites should provide links to download data
-
-AND / OR
-
+ - AND / OR
  - An API to get data via web requests (REST etc.)
 
-USGS web example - so so example
+`http://example.com/api/v3/get_rainfall?huc=08003&fmt=json`
+
 
 # Why you shouldn't do it
 
- - is the data available for sale, is it reasonable to
+ - Is the data available for sale, and if so, is it reasonable to
    bypass that?
- - web access logs will probably be logging your network
+ - Web access logs will probably be logging your network
    address, is that going to cause concern / misperception?
+ - Too many requests per second / hour / day maybe (temporarily)
+   block your access.
+
 
 # Getting content
 
-## urllib
+ - Browser tools for inspecting content
+ - "Hidden" data, e.g. coordinates on a map
+ - Links in an image
+
+https://www.epa.gov/ground-water-and-drinking-water/national-primary-drinking-water-regulations
+
+
+
+## urllib(s)
+
+ - All return HTML page content as a string / bytes
+ - Python 2 urllib - takes URL string
+ - Pyhton 2 urllib2 - builds request (headers, auth.)
+ - Python 3 urllib.request - like urllib2 above
+ - Python 3 recommends 3rd party requests library
+
+
 
 ## requests
 
+ - http://docs.python-requests.org/
+ - Requests: HTTP for Humans (TM)
+ - Requests is the only Non-GMO HTTP library for Python, safe for human consumption
+ - Requests 2 works with Python 3.x, Requests 3 is coming soon
+ - Better for handling multi stage log in (session)
+
+
+
 ### Authentication
 
+```python
+s = requests.Session()
+s.auth = ('user', 'pass')
+url = "https://example.com/protected_page.html"
+s.get(url)
+data['urls'][url] = s.text
+```
+
+
 # Caching content
+
+ - During development of a scraping script, you'll need the
+   content of a particular URL many times
+ - That content probably won't change, or the changes will
+   be unimportant for development
+ - Caching the URL's content locally will make development
+   much faster
+ - And minimize "too many requests per minute" lock outs
+
+
 
 ## Persistent dict
 ```python
@@ -61,6 +107,8 @@ def main():
         json.dump(data, open(CACHE_FILE, 'w'))
 ```
 
+
+
 ## Don't use the top level
 
 ```python
@@ -71,7 +119,6 @@ def main():
     ...
 }
 ```
-
 
 ```python
 {
@@ -117,6 +164,7 @@ def main():
         json.dump(data, open(CACHE_FILE, 'w'))
 ```
 
+
 # Parsing content
 
  - web scraping scripts often specific to a single web site
@@ -125,6 +173,9 @@ def main():
  - only needs to work for the content that is on the site, no need
    to worry about cases that don't occur
  
+
+
+
 ## Simple text parsing
 
 ```python
@@ -141,6 +192,8 @@ for line in data['url'][url].split('\n'):
  - simple cleanups may help, e.g.
    `content = content.replace("<p>", "\n")`
 
+
+
 ## HTML DOM
 
 ```xml
@@ -156,6 +209,8 @@ for line in data['url'][url].split('\n'):
 ...
 ```
 
+
+
 ## BeautifulSoup parser
 
  - XML is very uniform:
@@ -167,20 +222,29 @@ for line in data['url'][url].split('\n'):
 
 TODO: BeautifulSoup XPath?
 
+
+
 ## lxml
 
  - a more general purpose Python XML library, with a parser
    equivalent to BeautifulSoup
  - 
+
+
+
 ## Element recursion
 
 ```python
 def proc_element(state, element):
 ```
 
+
+
 ## XPath
 
+
 # Data export
+
 
 # Domain Specific Languages
 
@@ -190,15 +254,36 @@ RUN: 201904191310 25 8ef45 200
 342 522
 542 124
 123 452
-RUN: 201904191310 25 8ef45 200
-24 Jan 2018 12:23:34
-342 522
-542 124
-123 452
+RUN: 201904191310 25 8ef45 300
+24 Jan 2018 12:24:54
+423 252
+452 241
+231 542
 ```
 
 Data from an Arduino device
 
+
+
+## Convert to CSV
+
+```
+calib_run,temp_set,unit_id,targconc,time,adc_cond,adc_temp
+201904191310,25,8ef45,200,24 Jan 2018 12:23:34,342,522
+201904191310,25,8ef45,200,24 Jan 2018 12:23:34,542,124
+201904191310,25,8ef45,200,24 Jan 2018 12:23:34,123,452
+201904191310,25,8ef45,300,24 Jan 2018 12:24:54,423,252
+201904191310,25,8ef45,300,24 Jan 2018 12:24:54,452,241
+201904191310,25,8ef45,300,24 Jan 2018 12:24:54,231,542
+```
+
+
+
+## EBNF grammar
+
+Extended Backus-Naur Form<br/>(e.g. Python syntax docs.)
+
+```
 start: block+
 block: "RUN:" calib_run temp_set unit_id targconc time obs+
 
@@ -211,9 +296,7 @@ obs: adc_cond adc_temp
 adc_cond: NUMBER
 adc_temp: NUMBER
 
-%import common.LETTER
 %import common.NUMBER
-%import common.DIGIT
 %import common.WS
 %ignore WS
 S: WS+
@@ -221,8 +304,27 @@ CHARS: /\\S+/
 DATE: NUMBER S MNTH S NUMBER S CHARS
 MNTH: ("Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec")
 """
+```
 
-TODO: add log2csv.py example
 
- - convert anything to a tree of elements
- 
+
+## Converts anything to a tree of elements
+
+```
+  block
+    calib_run   201904191310
+    temp_set    25
+    unit_id     8ef45
+    targconc    200
+    time        24 Jan 2018 12:23:34
+    obs
+      adc_cond  342
+      adc_temp  522
+    obs
+      adc_cond  542
+      adc_temp  124
+    obs
+      adc_cond  123
+      adc_temp  452
+```
+
