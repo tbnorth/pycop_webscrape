@@ -177,10 +177,10 @@ def main():
 
 # Parsing content
 
- - web scraping scripts often specific to a single web site
- - often a static and / or legacy website that won't be changing
- - so the code needn't be perfect, it may only be run once
- - only needs to work for the content that is on the site, no need
+ - Web scraping scripts often specific to a single web site
+ - Often a static and / or legacy website that won't be changing
+ - So the code needn't be perfect, it may only be run once
+ - Only needs to work for the content that is on the site, no need
    to worry about cases that don't occur
  
 
@@ -229,16 +229,17 @@ for line in data['url'][url].split('\n'):
     `<div><img width=70 src="..."><br></dv>`
  - BeautifulSoup is a lenient parser which works out what people
    meant, based on what they wrote.
-
-TODO: BeautifulSoup XPath?
+ - See [BeautifulSoup docs.](http://www.crummy.com/software/BeautifulSoup/bs4/)
+   for guide to using BeautifulSoup for scraping.
 
 
 
 ## lxml
 
- - a more general purpose Python XML library, with a parser
+ - A more general purpose [Python XML library](https://lxml.de), with a parser
    equivalent to BeautifulSoup
- - 
+ - Using / learning lxml will give you a more general purpose
+   tool.
 
 
 
@@ -246,6 +247,7 @@ TODO: BeautifulSoup XPath?
 
 ```python
 def proc_element(state, element):
+
 ```
 
 

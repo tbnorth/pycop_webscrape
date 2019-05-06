@@ -27,8 +27,11 @@ def do_stuff(data):
     rows = recurse_tree(tree)
     print(rows)
     # get the same list with XPath
-    hrefs = tree.xpath("//tr//a/@href")
-    rows = tree.xpath("//tr[.//a]//text()")
+    trs = tree.xpath(".//tr[.//a]")
+    rows = []
+    for tr in trs:
+        rows.append([tr.xpath(".//@href")][0])
+        rows[-1].extend([i for i in tr.xpath(".//text()") if i.strip()])
     print(rows)
 
     for sub_url in rows:  # actually links within the same page
