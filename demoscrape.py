@@ -5,10 +5,7 @@ from lxml import etree
 
 CACHE_FILE = "scrape.cache.json"
 
-START_URL = (
-    "https://www.epa.gov/ground-water-and-drinking-water/"
-    "national-primary-drinking-water-regulations"
-)
+START_URL = "http://www.lakesuperiorstreams.org/streams/allwshed.html"
 
 
 def get_url(data, url):
@@ -26,14 +23,15 @@ def do_stuff(data):
     parser = etree.HTMLParser()
     # parse the text into a tree of Element nodes
     tree = etree.XML(html, parser)
-    # get the list of target urls using recursion
-    sub_urls = recurse_tree(tree)
-    print(sub_urls)
+    # get the rows using recursion
+    rows = recurse_tree(tree)
+    print(rows)
     # get the same list with XPath
-    sub_urls = tree.xpath("//div[contains(@class, 'node-page')]/ul//a/@href")
-    print(sub_urls)
+    hrefs = tree.xpath("//tr//a/@href")
+    rows = tree.xpath("//tr[.//a]//text()")
+    print(rows)
 
-    for sub_url in sub_urls:  # actually links within the same page
+    for sub_url in rows:  # actually links within the same page
         pass
 
 
