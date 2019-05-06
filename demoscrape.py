@@ -31,11 +31,10 @@ def do_stuff(data):
     rows = []
     for tr in trs:
         rows.append([tr.xpath(".//@href")][0])
-        rows[-1].extend([i for i in tr.xpath(".//text()") if i.strip()])
+        tds = tr.xpath("./td")
+        rows[-1].extend([' '.join(i.xpath(".//text()")) for i in tds])
     print(rows)
-
-    for sub_url in rows:  # actually links within the same page
-        pass
+    print(set(map(len, rows)))
 
 
 def recurse_tree(node):
