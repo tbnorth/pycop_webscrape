@@ -1,6 +1,7 @@
 import csv
 import json
 import os
+import platform
 import requests
 import traceback
 from lxml import etree
@@ -56,9 +57,12 @@ def do_stuff(data):
     for row in rows[:5]:
         print(row)
 
-    rows[:0] = [HDRS]
-    with open("streamdata.csv", 'wb') as out:
-        csv.writer(out).writerows(rows)
+    with open(
+        "streamdata.csv", 'wb' if platform.system() == 'Windows' else 'w'
+    ) as out:
+        writer = csv.writer(out)
+        writer.writerow(HDRS)
+        writer.writerows(rows)
 
     for row in rows:
         get_image(data, START_URL, row)
@@ -66,7 +70,7 @@ def do_stuff(data):
 
 def recurse_tree(node, state=None):
     if state is None:
-        state = {"res":[]}
+        state = {"res": []}
     if node.tag == 'thead':
         return
     if node.tag == 'tr':  # add a new row
@@ -81,7 +85,8 @@ def recurse_tree(node, state=None):
             state["res"][-1].append(node.text)
     else:
         for child in node:
-            ans = recurse_tree(child, state)
+            recurse_tree(child, state)
+
     return state
 
 
