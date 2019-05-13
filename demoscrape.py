@@ -1,7 +1,6 @@
 import csv
 import json
 import os
-import platform
 import requests
 import traceback
 from lxml import etree
@@ -57,9 +56,7 @@ def do_stuff(data):
     for row in rows[:5]:
         print(row)
 
-    with open(
-        "streamdata.csv", 'wb' if platform.system() == 'Windows' else 'w'
-    ) as out:
+    with open("streamdata.csv", 'w', newline='') as out:
         writer = csv.writer(out)
         writer.writerow(HDRS)
         writer.writerows(rows)
