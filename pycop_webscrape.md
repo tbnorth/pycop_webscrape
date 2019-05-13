@@ -31,7 +31,8 @@ https://tbnorth.github.io/pycop_webscrape/
 `http://example.com/api/v3/get_rainfall?huc=08003&fmt=json`
 
 
-# Why you shouldn't do it
+
+## Why you shouldn't do it
 
  - Is the data available for sale, and if so, is it reasonable to
    bypass that?
@@ -63,6 +64,8 @@ https://tbnorth.github.io/pycop_webscrape/
 # Getting content
 
  - Browser tools for inspecting content
+   - Inspect, handy but treacherous
+   - View source, clunky but honest
  - "Hidden" data, e.g. coordinates [on a map](https://www.skinnyski.com/trails/ski/listings.asp?region=ne-mn)
  - Or links [in an image](https://www.epa.gov/wqs-tech/state-specific-water-quality-standards-effective-under-clean-water-act-cwa)
  - Multi-level retrieval (contents listing, then data)

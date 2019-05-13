@@ -25,7 +25,10 @@ def do_stuff(data):
     tree = etree.XML(html, parser)
     # get the rows using recursion
     rows = recurse_tree(tree)
-    print(rows)
+    for row in rows["__res"][:5]:
+        print(row)
+    print()
+
     # get the same list with XPath
     trs = tree.xpath(".//tr[.//a]")
     rows = []
@@ -33,22 +36,30 @@ def do_stuff(data):
         rows.append([tr.xpath(".//@href")][0])
         tds = tr.xpath("./td")
         rows[-1].extend([' '.join(i.xpath(".//text()")) for i in tds])
-    print(rows)
+    for row in rows[:5]:
+        print(row)
     print(set(map(len, rows)))
 
 
-def recurse_tree(node):
-    if node.tag == 'div' and 'node-page' in node.get('class', ''):
-        node = [i for i in node if i.tag == 'ul'][0]
-        lis = [i for i in node]
-        hrefs = [i[0].get('href') for i in lis]
-        return hrefs
+def recurse_tree(node, state=None):
+    if state is None:
+        state = {"__res":[]}
+    if node.tag == 'thead':
+        return
+    if node.tag == 'tr':
+        state["__res"].append([])
+
+    if node.tag == 'td':
+        a = [i for i in node if i.tag == 'a']
+        if a:  # anchor / href node
+            state["__res"][-1].append(a[0].get('href'))
+            state["__res"][-1].append(a[0].text)
+        else:
+            state["__res"][-1].append(node.text)
     else:
         for child in node:
-            ans = recurse_tree(child)
-            if ans:
-                return ans
-    return None
+            ans = recurse_tree(child, state)
+    return state
 
 
 def main():
