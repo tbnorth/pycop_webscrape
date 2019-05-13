@@ -3,6 +3,7 @@
 https://tbnorth.github.io/pycop_webscrape/
 
 
+
 # Overview
 
  - What is web-scraping
@@ -13,13 +14,13 @@ https://tbnorth.github.io/pycop_webscrape/
    - Parsing data
 
 
+
 # What is web-scraping
 
 - Automated collection of data from web pages designed to
   be read by people.
 - Using software to fetch web content (based on URLs) and
   create structured data from the HTML etc. returned.
-
 
 
 ## Why you shouldn't need to do it
@@ -31,16 +32,14 @@ https://tbnorth.github.io/pycop_webscrape/
 `http://example.com/api/v3/get_rainfall?huc=08003&fmt=json`
 
 
-
 ## Why you shouldn't do it
 
  - Is the data available for sale, and if so, is it reasonable to
    bypass that?
  - Web access logs will probably be logging your network
    address, is that going to cause concern / misperception?
- - Too many requests per second / hour / day maybe (temporarily)
+ - Too many requests per second / hour / day may (temporarily)
    block your access.
-
 
 
 ## Why you'll wish you weren't doing it
@@ -49,16 +48,19 @@ https://tbnorth.github.io/pycop_webscrape/
  - `<!-- #BeginEditable "body" -->`
  - Even generated sites may have multiple generations
    of output format
+ 
+
 
 
 # Parsing content
 
- - Web scraping scripts often specific to a single web site
- - Often a static and / or legacy website that won't be changing
- - So the code needn't be perfect, it may only be run once
+ - Web scraping scripts are often<br/>specific to a single web site
+ - Often a static and / or legacy website that<br/>won't be changing
+ - So the code needn't be perfect, it<br/>may only be run once
  - Only needs to work for the content that is on the site, no need
    to worry about cases that don't occur
  
+
 
 
 # Getting content
@@ -73,6 +75,19 @@ https://tbnorth.github.io/pycop_webscrape/
  - Binary things (images, PDFs)
 
 
+## Data in web pages
+
+```HTML
+<table>
+  <tr><th>A</th><th>B</th><th>C</th></tr>
+  <tr><tb>1</tb><tb>3.4</tb><tb></tb></tr>
+  <tr><tb>1</tb><tb>-5.6</tb><tb></tb></tr>
+  <tr><tb>2</tb><tb>11</tb><tb>OK</tb></tr>
+</table>
+```
+
+ - All data is text (string), use `int()`, `float()` etc.
+
 
 ## urllib(s)
 
@@ -83,7 +98,6 @@ https://tbnorth.github.io/pycop_webscrape/
  - Python 3 recommends 3rd party `requests` library
 
 
-
 ## requests
 
  - http://docs.python-requests.org/
@@ -91,7 +105,6 @@ https://tbnorth.github.io/pycop_webscrape/
  - Requests is the only Non-GMO HTTP library for Python, safe for human consumption
  - Requests 2 works with Python 3.x, Requests 3 is coming soon
  - Better for handling multi stage log in (session)
-
 
 
 ## Authentication
@@ -109,6 +122,7 @@ Site login style authentication is doable but more
 site specific.
 
 
+
 # Caching content
 
  - During development of a scraping script, you'll need the
@@ -118,7 +132,6 @@ site specific.
  - Caching the URL's content locally will make development
    much faster
  - And minimize "too many requests per minute" lock outs
-
 
 
 ## Persistent dict
@@ -136,7 +149,6 @@ def main():
     finally:
         json.dump(data, open(CACHE_FILE, 'w'))
 ```
-
 
 
 ## Don't use the top level
@@ -163,7 +175,6 @@ def main():
 ```
 
 
-
 ## Don't use the second level either...
 
 ```python
@@ -186,7 +197,6 @@ def main():
 (Unless you want to)
 
 
-
 ## First time set up of persistent dict
 
 ```python
@@ -205,10 +215,10 @@ def main():
 ```
 
 
+
 # Parsing content and extracting data
 
 Whatever works. 
-
 
 
 ## Simple text parsing
@@ -223,7 +233,6 @@ Whatever works.
 <div>Population: 1,339,000,000</div>
 <div>Sheep: Unknown</div>
 ```
-
 
 
 ## Simple text parsing
@@ -241,7 +250,6 @@ for line in data['url'][url].split('\n'):
  - assumes Country: and Population: occur at start of line
  - assumes Country: before Population:
  - simple cleanups may help, e.g. removing some tags
-
 
 
 ## HTML DOM
@@ -262,7 +270,6 @@ for line in data['url'][url].split('\n'):
 Do **not** parse XML or HTML yourself.
 
 
-
 ## BeautifulSoup parser
 
  - XML is very uniform:
@@ -275,29 +282,87 @@ Do **not** parse XML or HTML yourself.
    for guide to using BeautifulSoup for scraping.
 
 
-
 ## lxml
 
  - A more general purpose [Python XML library](https://lxml.de), with a parser
    equivalent to BeautifulSoup
  - Using / learning lxml will give you a more general purpose
    tool.
+ - Parses the XML text into a tree of `Element` nodes
 
 
+## Tree of Elements
 
-## Element recursion
-
-```python
-def proc_element(state, element):
-
+```HTML
+<Element>
+<Element>
+    <Element>
+    <Element>
+        <Element>
+        <Element>
+    <Element>
+<Element>
 ```
 
+
+## Element properties
+
+```python
+node.tag  # "table" or "img" or a or some other HTML element
+node.text  # <span>this text here</span>
+node.tail  # <span>not this text</span>this text here
+node[0]  # the node's first child node (nodes are lists)
+node.get("href")
+ # the link from <a href="http://foo.com">click here</a>
+```
+
+
+## Element recursion / DOM traversal
+
+ - Recursive algorithms can walk a tree of Elements
+   (see example code)
+ - You can move around the tree:  
+   `parent = node.getparent()`
+ - And process the child nodes:  
+   `for child in node: ...`
+ - But there's an easier way, XPath
 
 
 ## XPath
 
+ - [Xpath](https://lxml.de/xpathxslt.html) is a W3C standard, a
+   concise query language for finding things in
+   XML or tree structured data
+ - HTML parsed by lxml or BeautifulSoup will be cleanly
+   tree structured
+ - Lots of tutorials on-line
+
+
+## XPath examples
+
+```text
+Find a SPAN which is the direct child of a PRE which is the
+descendent of an DIV
+    DIV//PRE/SPAN
+Find a SPAN which is the direct child of a PRE with align='center'
+which is the descendent of an DIV
+    DIV//PRE[@align='center']/SPAN
+Find a SPAN whose parent element is red
+    //SPAN[../@color='red']
+```
+
+
+
+# Demo code
+
+A quick run through [demoscrape.py](./demoscrape.py).
+
+
 
 # Data export
+
+ - write to CSV or a database
+
 
 
 # Domain Specific Languages
@@ -318,7 +383,6 @@ RUN: 201904191310 25 8ef45 300
 Data from an Arduino device
 
 
-
 ## Convert to CSV
 
 ```
@@ -332,11 +396,11 @@ calib_run,temp_set,unit_id,targconc,time,adc_cond,adc_temp
 ```
 
 
-
 ## EBNF grammar
 
 Extended Backus-Naur Form<br/>(e.g. Python syntax docs.)
 
+<!-- .element: data-state='scrollable' -->
 ```
 start: block+
 block: "RUN:" calib_run temp_set unit_id targconc time obs+
@@ -361,7 +425,6 @@ MNTH: ("Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec")
 ```
 
 
-
 ## Converts anything to a tree of elements
 
 ```
@@ -382,3 +445,10 @@ MNTH: ("Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec")
       adc_temp  452
 ```
 
+
+
+# Web-scraping in Python
+
+https://tbnorth.github.io/pycop_webscrape/
+
+Questions?
