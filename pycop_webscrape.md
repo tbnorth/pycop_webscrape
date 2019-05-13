@@ -15,11 +15,14 @@ https://tbnorth.github.io/pycop_webscrape/
 
 # What is web-scraping
 
-Automated collection of data from web pages designed to
-be read by people.
+- Automated collection of data from web pages designed to
+  be read by people.
+- Using software to fetch web content (based on URLs) and
+  create structured data from the HTML etc. returned.
 
 
-# Why you shouldn't need to do it
+
+## Why you shouldn't need to do it
 
  - Data rich sites should provide links to download data
  - AND / OR
@@ -38,6 +41,25 @@ be read by people.
    block your access.
 
 
+
+## Why you'll wish you weren't doing it
+
+ - Hand edited sites lack consistency
+ - `<!-- #BeginEditable "body" -->`
+ - Even generated sites may have multiple generations
+   of output format
+
+
+# Parsing content
+
+ - Web scraping scripts often specific to a single web site
+ - Often a static and / or legacy website that won't be changing
+ - So the code needn't be perfect, it may only be run once
+ - Only needs to work for the content that is on the site, no need
+   to worry about cases that don't occur
+ 
+
+
 # Getting content
 
  - Browser tools for inspecting content
@@ -45,6 +67,7 @@ be read by people.
  - Or links [in an image](https://www.epa.gov/wqs-tech/state-specific-water-quality-standards-effective-under-clean-water-act-cwa)
  - Multi-level retrieval (contents listing, then data)
  - Tables [linked from a list](https://www.epa.gov/ground-water-and-drinking-water/national-primary-drinking-water-regulations)
+ - Binary things (images, PDFs)
 
 
 
@@ -54,7 +77,7 @@ be read by people.
  - Python 2 urllib - takes URL string
  - Pyhton 2 urllib2 - builds request (headers, auth.)
  - Python 3 urllib.request - like urllib2 above
- - Python 3 recommends 3rd party requests library
+ - Python 3 recommends 3rd party `requests` library
 
 
 
@@ -68,7 +91,9 @@ be read by people.
 
 
 
-### Authentication
+## Authentication
+
+For older, less common "pop-up" authentication:
 
 ```python
 s = requests.Session()
@@ -77,6 +102,8 @@ url = "https://example.com/protected_page.html"
 s.get(url)
 data['urls'][url] = s.text
 ```
+Site login style authentication is doable but more
+site specific.
 
 
 # Caching content
@@ -175,14 +202,24 @@ def main():
 ```
 
 
-# Parsing content
+# Parsing content and extracting data
 
- - Web scraping scripts often specific to a single web site
- - Often a static and / or legacy website that won't be changing
- - So the code needn't be perfect, it may only be run once
- - Only needs to work for the content that is on the site, no need
-   to worry about cases that don't occur
- 
+Whatever works. 
+
+
+
+## Simple text parsing
+
+```html
+<h2>Contries</h2>
+<div>Country: New Zealand</div>
+<div>Population: 4321321</div>
+<div>Sheep: 12,000,000</div>
+<hr/>
+<div>Country: India</div>
+<div>Population: 1,339,000,000</div>
+<div>Sheep: Unknown</div>
+```
 
 
 
@@ -191,16 +228,16 @@ def main():
 ```python
 result = {}
 for line in data['url'][url].split('\n'):
+    line = line.replace("<div>", "").replace("</div>", "")
     if "Country" in line:  # Country: New Zealand
         country = line.split(None, 1)[1]
-        if "Population" in line:  # Population: 4321321
-            result[country] = int(line.split()[1])
+    if "Population" in line:  # Population: 4321321
+        result[country] = int(line.split()[1])
 ```
 
  - assumes Country: and Population: occur at start of line
  - assumes Country: before Population:
- - simple cleanups may help, e.g.
-   `content = content.replace("<p>", "\n")`
+ - simple cleanups may help, e.g. removing some tags
 
 
 
@@ -218,6 +255,8 @@ for line in data['url'][url].split('\n'):
     <TABLE>
 ...
 ```
+
+Do **not** parse XML or HTML yourself.
 
 
 
