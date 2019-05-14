@@ -9,6 +9,7 @@ https://tbnorth.github.io/pycop_webscrape/
  - What is web-scraping
  - Why you shouldn't need to do it
  - Why you shouldn't do it
+ - Why you'll wish you weren't doing it
  - How to do it
    - Getting data
    - Parsing data
@@ -118,7 +119,7 @@ url = "https://example.com/protected_page.html"
 s.get(url)
 data['urls'][url] = s.text
 ```
-Site login style authentication is doable but more
+Site login authentication is doable but more
 site specific.
 
 
@@ -165,7 +166,7 @@ def main():
 ```python
 {
     'last_run': "Sat 05/04/2019", 
-    'url: {
+    'url': {
         "http://www...": "<html><head><title>XKCD - 12...",
         "http://www...": "<html><head><title>XKCD - 13...",
         "http://www...": "<html><head><title>XKCD - 14...",
